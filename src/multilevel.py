@@ -176,9 +176,8 @@ def multi_cycles(
     circuit: List,
     coupling_graph: List[Tuple[int, int]],
     random_seed: int,
-    coarser_rep: int = 50,
+    coarsest_solving_trials: int = 50,
     num_interpolation: int = 10,
-    stuck_sabre_trial: int = 500,
     use_initial_embedding: bool = True
 ) -> Tuple[int, Dict[int, int], List]:
     """
@@ -189,10 +188,8 @@ def multi_cycles(
         circuit: The quantum circuit to optimize
         coupling_graph: Physical coupling graph of the device
         random_seed: Random seed for reproducibility
-        clustering_protocol: Protocol for clustering
-        coarser_rep: Number of repetitions at coarser level
+        coarsest_solving_trials: Number of trials at the coarsest level
         num_interpolation: Number of interpolation steps
-        stuck_sabre_trial: Number of trials when stuck
         use_initial_embedding: Whether to use initial embedding
         
     Returns:
@@ -218,7 +215,7 @@ def multi_cycles(
             coupling_graph,
             current_mapping,
             random_seed,
-            coarser_rep,
+            coarsest_solving_trials,
             num_interpolation
         )
         current_mapping = last_result[1]

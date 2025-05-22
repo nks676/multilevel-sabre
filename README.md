@@ -36,9 +36,8 @@ pass_ = MultiCyclesSwapPass(
     coupling_graph=coupling_map,
     cycles=10,                    # Number of optimization cycles
     random_seed=1,               # Random seed for reproducibility
-    coarser_rep=50,              # Coarser representation parameter
+    coarsest_solving_trials=50,  # Number of trials at the coarsest level
     num_interpolation=10,        # Number of interpolation steps
-    stuck_sabre_trial=500,       # Number of trials for stuck SABRE
     use_initial_embedding=True   # Whether to use initial embedding
 )
 
@@ -52,9 +51,8 @@ optimized_circuit = pm.run(circuit)
 - `coupling_graph`: The coupling map of the quantum device
 - `cycles`: Number of optimization cycles (default: 10)
 - `random_seed`: Random seed for reproducibility (default: 1)
-- `coarser_rep`: Coarser representation parameter (default: 50)
+- `coarsest_solving_trials`: Number of trials at the coarsest level (default: 50)
 - `num_interpolation`: Number of interpolation steps (default: 10)
-- `stuck_sabre_trial`: Number of trials for stuck SABRE (default: 500)
 - `use_initial_embedding`: Whether to use initial embedding (default: True)
 
 ## License
