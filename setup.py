@@ -6,7 +6,7 @@ setup(
     package_dir={"multilevel_sabre": "src"},
     packages=["multilevel_sabre"],
     install_requires=[
-        "qiskit>=2.0",
+        "qiskit>=1.4",
     ],
     author="Naren Sathishkumar",
     author_email="nks676@ucla.edu",
