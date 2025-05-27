@@ -4,6 +4,11 @@ A Qiskit transpiler pass that implements the MultiLevel SABRE algorithm for quan
 
 ## Installation
 
+### From PyPI
+```bash
+pip install multilevel-sabre
+```
+
 ### Development Mode Installation
 
 If you're developing or want to use the package in a Jupyter notebook, you can install it in development mode:
