@@ -7,6 +7,9 @@ setup(
     packages=["multilevel_sabre"],
     install_requires=[
         "qiskit>=1.4",
+        "networkx>=3.0",
+        "numpy>=1.20",
+        "scipy>=1.7",
     ],
     author="Naren Sathishkumar",
     author_email="nks676@ucla.edu",

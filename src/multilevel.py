@@ -14,7 +14,8 @@ def multilevel_cycle_sabre(
     initial_mapping: Dict[int, int],
     random_seed: int,
     coarser_rep: int = 50,
-    num_interpolation: int = 10
+    num_interpolation: int = 10,
+    verbose: bool = False
 ) -> Tuple[Tuple[int, Dict[int, int], List], Tuple[int, Dict[int, int], List]]:
     """
     Perform a single cycle of multilevel SABRE algorithm.
@@ -27,6 +28,7 @@ def multilevel_cycle_sabre(
         clustering_protocol: Protocol for clustering ('current' or 'until no swap')
         coarser_rep: Number of repetitions at coarser level
         num_interpolation: Number of interpolation steps
+        verbose: Whether to print detailed progress messages
         
     Returns:
         Tuple containing (best_result, current_result)
@@ -178,7 +180,8 @@ def multi_cycles(
     random_seed: int,
     coarsest_solving_trials: int = 50,
     num_interpolation: int = 10,
-    use_initial_embedding: bool = True
+    use_initial_embedding: bool = True,
+    verbose: bool = False
 ) -> Tuple[int, Dict[int, int], List]:
     """
     Perform multiple cycles of multilevel SABRE algorithm.
@@ -191,10 +194,12 @@ def multi_cycles(
         coarsest_solving_trials: Number of trials at the coarsest level
         num_interpolation: Number of interpolation steps
         use_initial_embedding: Whether to use initial embedding
+        verbose: Whether to print detailed progress messages
         
     Returns:
         Best result tuple containing (num_swaps, mapping, compiled_circuit)
     """
+    start_time = time.time()
     best_result = (np.inf, None, None)
 
     # Initialize mapping
@@ -209,21 +214,24 @@ def multi_cycles(
     current_seed = random_seed
 
     for cycle in range(cycles):
-        print("Cycle:", cycle)
+        cycle_start_time = time.time()
         current_best, last_result = multilevel_cycle_sabre(
             circuit,
             coupling_graph,
             current_mapping,
             random_seed,
             coarsest_solving_trials,
-            num_interpolation
+            num_interpolation,
+            verbose
         )
         current_mapping = last_result[1]
+        cycle_time = time.time() - cycle_start_time
 
         # Check for stuck condition
         for prev_map in history_mapping:
             if current_mapping == prev_map:
-                print("Stuck condition detected")
+                if verbose:
+                    print("Stuck condition detected")
                 break
 
         if current_best[0] < best_result[0]:
@@ -232,8 +240,10 @@ def multi_cycles(
         if best_result[0] == 0:
             break
         
-        print("Current best result:", best_result[0])
-        print("Last result:", last_result[0])
+        print(f"Cycle {cycle}, current result: {last_result[0]}, best result: {best_result[0]}, time: {cycle_time:.2f}s")
+
+    total_time = time.time() - start_time
+    print(f"Summary: {best_result[0]} SWAP, total compilation time: {total_time:.2f}s")
 
     return best_result
 

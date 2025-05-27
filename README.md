@@ -1,60 +1,20 @@
 # MultiLevel SABRE
 
-A Qiskit transpiler pass that implements a multi-level SABRE algorithm for quantum circuit optimization. This package provides the `MultiCyclesSwapPass` which can be used as a custom transpiler pass in Qiskit to optimize quantum circuits for specific device topologies.
+A Qiskit transpiler pass that implements the MultiLevel SABRE algorithm for quantum circuit optimization.
 
 ## Installation
 
-Clone the repository and install from source:
+### Development Mode Installation
 
-```bash
-git clone https://github.com/nks676/multilevel-sabre.git
-cd multilevel-sabre
-pip install .
-```
-
-For development installation (changes to source code will be reflected immediately):
-
-```bash
-pip install -e .
-```
-
-## Usage
+If you're developing or want to use the package in a Jupyter notebook, you can install it in development mode:
 
 ```python
-from qiskit import QuantumCircuit
-from qiskit.transpiler import PassManager, CouplingMap
-from multilevel_sabre import MultiCyclesSwapPass
+# If your notebook is in a subdirectory (like examples/):
+import os
+!cd {os.path.dirname(os.getcwd())} && pip install -e .
 
-# Create your quantum circuit
-circuit = QuantumCircuit(...)
-
-# Define your coupling map
-coupling_map = CouplingMap(...)
-
-# Create the pass
-pass_ = MultiCyclesSwapPass(
-    coupling_graph=coupling_map,
-    cycles=10,                    # Number of optimization cycles
-    random_seed=1,               # Random seed for reproducibility
-    coarsest_solving_trials=50,  # Number of trials at the coarsest level
-    num_interpolation=10,        # Number of interpolation steps
-    use_initial_embedding=True   # Whether to use initial embedding
-)
-
-# Create a pass manager and run the pass
-pm = PassManager(pass_)
-optimized_circuit = pm.run(circuit)
+# If your notebook is in the project root:
+!pip install -e .
 ```
 
-## Parameters
-
-- `coupling_graph`: The coupling map of the quantum device
-- `cycles`: Number of optimization cycles (default: 10)
-- `random_seed`: Random seed for reproducibility (default: 1)
-- `coarsest_solving_trials`: Number of trials at the coarsest level (default: 50)
-- `num_interpolation`: Number of interpolation steps (default: 10)
-- `use_initial_embedding`: Whether to use initial embedding (default: True)
-
-## License
-
-MIT License 
+For more detailed examples, see the `examples` directory.
