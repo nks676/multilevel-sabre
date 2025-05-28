@@ -50,7 +50,8 @@ def multilevel_cycle_sabre(
         [current_mapping]
     )
     best_result = (num_swaps, current_mapping, compiled_circuit)
-    print("Initial mapping quality:", num_swaps)
+    if verbose:
+        print("Initial mapping quality:", num_swaps)
 
     if num_swaps == 0:
         return best_result, best_result
@@ -85,11 +86,13 @@ def multilevel_cycle_sabre(
         else:
             if clustering_protocol == "until no swap":
                 levels.append((physical_coarser, program_coarser, current_circuit, current_coupling, current_mapping))
-            print("No more swaps needed at this level")
+            if verbose:
+                print("No more swaps needed at this level")
             break
 
-    print("Number of coarser levels:", len(levels))
-    print("Finished coarsening in", time.time() - start_time)
+    if verbose:
+        print("Number of coarser levels:", len(levels))
+        print("Finished coarsening in", time.time() - start_time)
 
     # Process coarser levels if they exist
     if len(levels) > 0:
@@ -103,12 +106,14 @@ def multilevel_cycle_sabre(
             [current_mapping]
         )
         current_mapping = result[1]
-        print("Coarser level solved in", time.time() - start_time)
+        if verbose:
+            print("Coarser level solved in", time.time() - start_time)
 
         # Process intermediate levels
         if len(levels) > 1:
             for i in reversed(range(1, len(levels))):
-                print("Processing level", i)
+                if verbose:
+                    print("Processing level", i)
                 program_c, physical_c, _, _, _ = levels[i]
                 _, _, prev_circuit, prev_coupling, _ = levels[i-1]
                 
@@ -121,7 +126,8 @@ def multilevel_cycle_sabre(
                     random_seed,
                     num_interpolation
                 )
-                print("Interpolation finished in", time.time() - start_time)
+                if verbose:
+                    print("Interpolation finished in", time.time() - start_time)
                 
                 # Refine solution
                 current_result = sabre(
@@ -131,7 +137,8 @@ def multilevel_cycle_sabre(
                     random_seed,
                     interpolation_results
                 )
-                print("Refinement finished in", time.time() - start_time)
+                if verbose:
+                    print("Refinement finished in", time.time() - start_time)
                 current_mapping = current_result[1]
 
         # Final level processing
@@ -151,7 +158,8 @@ def multilevel_cycle_sabre(
             random_seed,
             final_interpolation
         )
-        print("Final level compilation finished in", time.time() - start_time)
+        if verbose:
+            print("Final level compilation finished in", time.time() - start_time)
 
         if compilation_result[0] < best_result[0]:
             best_result = compilation_result
@@ -181,7 +189,7 @@ def multi_cycles(
     coarsest_solving_trials: int = 50,
     num_interpolation: int = 10,
     use_initial_embedding: bool = True,
-    verbose: bool = False
+    verbose: int = 0
 ) -> Tuple[int, Dict[int, int], List]:
     """
     Perform multiple cycles of multilevel SABRE algorithm.
@@ -194,7 +202,10 @@ def multi_cycles(
         coarsest_solving_trials: Number of trials at the coarsest level
         num_interpolation: Number of interpolation steps
         use_initial_embedding: Whether to use initial embedding
-        verbose: Whether to print detailed progress messages
+        verbose: Controls the verbosity level of the output:
+            - 0: No output (off)
+            - 1: Minimal output (basic progress information)
+            - 2: Full output (detailed progress and statistics)
         
     Returns:
         Best result tuple containing (num_swaps, mapping, compiled_circuit)
@@ -222,7 +233,7 @@ def multi_cycles(
             random_seed,
             coarsest_solving_trials,
             num_interpolation,
-            verbose
+            verbose > 0  # Pass True if verbose > 0 to enable basic progress in multilevel_cycle_sabre
         )
         current_mapping = last_result[1]
         cycle_time = time.time() - cycle_start_time
@@ -230,7 +241,7 @@ def multi_cycles(
         # Check for stuck condition
         for prev_map in history_mapping:
             if current_mapping == prev_map:
-                if verbose:
+                if verbose >= 2:  # Only print in full verbosity mode
                     print("Stuck condition detected")
                 break
 
@@ -240,10 +251,12 @@ def multi_cycles(
         if best_result[0] == 0:
             break
         
-        print(f"Cycle {cycle}, current result: {last_result[0]}, best result: {best_result[0]}, time: {cycle_time:.2f}s")
+        if verbose >= 1:  # Print cycle information for minimal and full verbosity
+            print(f"Cycle {cycle}, current result: {last_result[0]}, best result: {best_result[0]}, time: {cycle_time:.2f}s")
 
     total_time = time.time() - start_time
-    print(f"Summary: {best_result[0]} SWAP, total compilation time: {total_time:.2f}s")
+    if verbose >= 1:  # Print summary for minimal and full verbosity
+        print(f"Summary: {best_result[0]} SWAP, total compilation time: {total_time:.2f}s")
 
     return best_result
 

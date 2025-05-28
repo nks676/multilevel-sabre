@@ -4,8 +4,9 @@ from qiskit.transpiler import PassManager, CouplingMap
 from qiskit.converters import dag_to_circuit, circuit_to_dag
 from typing import List, Tuple
 
-class MultiCyclesSwapPass(TransformationPass):
-    """A transpiler pass that implements the MultiLevel SABRE algorithm for quantum circuit optimization.
+class MultiLevelSabre(TransformationPass):
+    """
+    A transpiler pass that implements the MultiLevel SABRE algorithm for quantum circuit optimization.
     
     This pass optimizes quantum circuits by finding efficient SWAP gate insertions to satisfy
     hardware connectivity constraints. It uses a multi-level approach where the circuit is
@@ -44,9 +45,12 @@ class MultiCyclesSwapPass(TransformationPass):
         mapping. If False, starts with a random mapping.
         Default is True.
         
-    verbose : bool, optional
-        If True, print progress information during optimization.
-        Default is False.
+    verbose : int, optional
+        Controls the verbosity level of the output:
+        - 0: No output (off)
+        - 1: Minimal output (basic progress information)
+        - 2: Full output (detailed progress and statistics)
+        Default is 0.
     """
 
     def __init__(
@@ -57,7 +61,7 @@ class MultiCyclesSwapPass(TransformationPass):
         coarsest_solving_trials: int = 50,
         num_interpolation: int = 10,
         use_initial_embedding: bool = True,
-        verbose: bool = False
+        verbose: int = 0
     ):
         super().__init__()
         self.coupling_graph = coupling_graph

@@ -301,7 +301,6 @@ def initial_embedding(coupling_graph, circuit):
 
     if isline:
         longest_device_path=find_longest_path(coupling_g)
-        print("longest path:",len(longest_device_path))
         circuit_path_list=find_diameter_path(circuit_g)[0]
         if len(longest_device_path)>=number_of_program_qubits:
             for i in range(number_of_program_qubits):
