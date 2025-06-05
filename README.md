@@ -1,10 +1,16 @@
 # MultiLevel SABRE
 
-A Python implementation of the MultiLevel SABRE algorithm for quantum circuit optimization.
+MultiLevel SABRE is a Qiskit transpiler pass that applies a multi-level approach to the
+[SABRE](https://arxiv.org/abs/1809.02573) qubit routing algorithm. The algorithm
+coarsens the circuit to a simplified representation, solves the routing problem
+at the coarsest level and then refines the solution back to the original
+circuit. This often yields fewer SWAP gates compared to running SABRE directly on
+the full circuit.
 
 ## Installation
 
-Since this package is not yet published on PyPI, you can install it locally using pip:
+The package is not published on PyPI yet, so install it from the repository
+root using `pip`:
 
 ```bash
 pip install -e .
@@ -12,22 +18,18 @@ pip install -e .
 
 ## Usage
 
-Check the `examples` directory for detailed example notebooks and scripts demonstrating how to use the MultiLevel SABRE algorithm. The examples include:
-
-- Simple circuit optimization
-- Comparison with the original SABRE algorithm
-- Performance analysis and benchmarking
+Example notebooks and scripts are available in the `examples` directory. They
+show how to optimise circuits and compare the results with the original SABRE
+pass.
 
 ### Simple Example
 
-Here's a basic example of how to use the MultiLevel SABRE algorithm with a simple circuit:
-
 ```python
 from qiskit import QuantumCircuit
-from qiskit.transpiler import CouplingMap
+from qiskit.transpiler import CouplingMap, PassManager
 from multilevel_sabre import MultiLevelSabre
 
-# Create a quantum circuit
+# Create a simple circuit
 circuit = QuantumCircuit(5)
 circuit.h(0)
 circuit.cx(0, 1)
@@ -35,59 +37,55 @@ circuit.cx(1, 2)
 circuit.cx(2, 3)
 circuit.cx(3, 4)
 
-# Define the hardware topology (example: linear chain)
+# Linear chain hardware topology
 coupling_map = CouplingMap.from_line(5)
 
-# Create and run the MultiLevel SABRE pass
+# Run the MultiLevel SABRE optimisation
 pass_manager = PassManager([
     MultiLevelSabre(
         coupling_graph=coupling_map,
-        cycles=10,                    # Number of optimization cycles
-        random_seed=1,                # Random seed for reproducibility
-        coarsest_solving_trials=50,   # Number of trials at coarsest level
-        num_interpolation=10,         # Number of interpolation steps
-        use_initial_embedding=True,   # Use initial qubit mapping
-        verbose=0                     # Verbosity level (0: off, 1: minimal, 2: full)
+        cycles=10,
+        random_seed=1,
+        coarsest_solving_trials=50,
+        num_interpolation=10,
+        use_initial_embedding=True,
+        verbose=0,
     )
 ])
-
-# Run the pass
-optimized_circuit = pass_manager.run(circuit)
+optimised = pass_manager.run(circuit)
 ```
 
 ### Comparison with SABRE
 
-The package includes a comparison example that demonstrates the performance difference between MultiLevel SABRE and the original SABRE algorithm. You can run it using:
-
-```bash
+```
 python examples/comparison_example.py
 ```
 
-This example:
-1. Loads a QASM circuit
-2. Runs both SABRE and MultiLevel SABRE on the same circuit
-3. Compares the number of SWAP gates and compilation time
-4. Shows the speedup and SWAP reduction achieved by MultiLevel SABRE
+The script loads a benchmark circuit, runs both SABRE and MultiLevel SABRE and
+prints the number of SWAP gates and compilation time for each.
 
 ## Parameters
 
-The `MultiLevelSabre` class accepts the following parameters:
+The `MultiLevelSabre` class exposes the following arguments:
 
-- `coupling_graph` (CouplingMap): The hardware topology defining which qubits can interact directly.
-- `cycles` (int, default=10): Number of times to run the multi-level algorithm. Each cycle may produce different results due to randomization. The best result (fewest SWAPs) is kept.
-- `random_seed` (int, default=1): Seed for the random number generator. Use this for reproducible results.
-- `coarsest_solving_trials` (int, default=50): Number of trials to attempt at the coarsest level of the circuit. More trials may find better solutions but take longer to run.
-- `num_interpolation` (int, default=10): Number of interpolation steps used when refining the circuit from the coarsest level back to the original size. More steps may produce better results but take longer to compute.
-- `use_initial_embedding` (bool, default=True): Whether to use an initial qubit mapping/embedding before starting the optimization. If True, uses a simple heuristic to find an initial mapping. If False, starts with a random mapping.
-- `verbose` (int, default=0): Controls the verbosity level of the output:
-  - 0: No output (off)
-  - 1: Minimal output (basic progress information)
-  - 2: Full output (detailed progress and statistics)
+- **`coupling_graph`** (`CouplingMap`): hardware coupling map.
+- **`cycles`** (`int`, default `10`): number of optimisation cycles. The best
+  result across cycles is returned.
+- **`random_seed`** (`int`, default `1`): seed for randomness.
+- **`coarsest_solving_trials`** (`int`, default `50`): number of attempts at the
+  coarsest level.
+- **`num_interpolation`** (`int`, default `10`): number of interpolation steps
+  during refinement.
+- **`use_initial_embedding`** (`bool`, default `True`): whether to start from an
+  initial heuristic mapping.
+- **`verbose`** (`int`, default `0`): verbosity level (`0`, `1`, or `2`).
+
+## Citation
+
+If you use this code in your research, please cite the MultiLevel SABRE paper
+and reference this repository.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License. See `LICENSE` for details.
 
-# citation section
-
-# add docstring of parameters
